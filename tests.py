@@ -1,3 +1,4 @@
+from math import degrees
 from vector import Vector
 
 v = Vector([1,2,3,7,9])
@@ -45,10 +46,66 @@ def print_features():
     print('---------------')
 
 
-print_vectors()
-print_null()
-print_operations()
-print_magnitude_and_direction()
-print_features()
+#print_vectors()
+#print_null()
+#print_operations()
+#print_magnitude_and_direction()
+#print_features()
+
+print('------- EXCERCISES --------')
+a = Vector([8.218, -9.341])
+b = Vector([-1.129, 2.111])
+
+print('1', a.add(b))
+
+c = Vector([7.119, 8.215])
+d = Vector([-8.223, 0.878])
+
+print('2', c.subtract(d))
+
+e = Vector([1.671, -1.012, -0.318])
+print('3', e.multiply(7.41))
+
+if not a.add(b) == Vector([7.089, -7.229999999999999]):
+    raise ValueError('Error in addition')
+
+if not c.subtract(d) == Vector([15.342, 7.337]):
+    raise ValueError('Error in subtraction')
+
+if not e.multiply(7.41) == Vector([12.38211, -7.49892, -2.35638]):
+    raise ValueError('Error in scalar multiplication')
+
+a = Vector([-0.221, 7.437])
+print(a.magnitude)
+
+b = Vector([8.813, -1.331, -6.247])
+print(b.magnitude)
+
+a = Vector([5.581, -2.136])
+print(a.unit)
+
+a = Vector([1.996, 3.108, -4.554])
+print(a.unit)
+
+print('dot products')
+a = Vector([7.887, 4.138])
+b = Vector([-8.802, 6.776])
+print(a.dot(b))
+
+a = Vector([-5.955, -4.904, -1.874])
+b = Vector([-4.496, -8.755, 7.103])
+print(a.dot(b))
+
+print('angles')
+a = Vector([3.183, -7.627])
+b = Vector([-2.668, 5.319])
+print(a.angle(b))
+
+a = Vector([7.35, 0.221, 5.188])
+b = Vector([2.751, 8.259, 3.985])
+print(degrees(a.angle(b)))
+
+
+
 
 
