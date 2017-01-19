@@ -29,6 +29,14 @@ class Vector(object):
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Vectors')
         return True if self.unit == other.unit else False
+
+    """@property
+    def coordinates(self):
+        return self.coordinates
+
+    @property
+    def dimension(self):
+        return self.dimension"""
  
     def add(self, other):
         return self.__class__(
@@ -83,24 +91,3 @@ class Vector(object):
         )
 
 
-v = Vector([1,2,3,7,9])
-w = Vector([5,6,2,4,9,1,4,8,4])
-
-print(v.__class__)
-
-n = Vector([0,0,0,0,0,0])
-#print(n.magnitude)
-
-v_ = v.multiply(3.5)
-
-print(v.add(w))
-print(v.subtract(w))
-print(w.subtract(v))
-print(v.multiply(3))
-print(v == w)
-print(v.magnitude)
-print(w.magnitude)
-print(v.unit)
-print(w.unit)
-print(v.__same_class__(w))
-print(v.__same_class__(v_))
