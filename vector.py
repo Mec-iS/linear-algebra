@@ -1,5 +1,5 @@
 from itertools import zip_longest
-from math import sqrt, acos
+from math import sqrt, acos, isclose
 
 class Vector(object):
     def __init__(self, coordinates):
@@ -20,7 +20,9 @@ class Vector(object):
     def __eq__(self, other):
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Vectors')
-        return self.coordinates == other.coordinates
+        if other.dimension != self.dimension:
+            return False
+        return all([isclose(c, other.coordinates[i]) for i, c in enumerate(self.coordinates)])
     
     def __same_class__(self, other):
         """
@@ -31,12 +33,30 @@ class Vector(object):
             raise TypeError('can compare only two Vectors')
         return True if self.unit == other.unit else False
 
-    def __same_class_dot_(self, other):
+    def __same_class_dot__(self, other, tolerance=1e-09):
         """
         Chek if two vectors are in the same class using dot 
-         product.
+         product. (if they are in the same class, they are parallel).
+        
+        Dot Product: |v| dot |w| = ||v|| * ||w|| * cos(teta)
+
+        if |v| dot |w| equals ||v|| * ||w||, it means that cos(teta) 
+         between v and w is 1. They are parallel and pointing to 
+         the same direction. Then they belong to the same class.
         """
-        pass
+        if other.__class__ != self.__class__:
+            raise TypeError('can compare only two Vectors')
+        return True if isclose(
+            abs(self.dot(other)), abs(self.magnitude * other.magnitude)
+        ) else False
+
+    @property
+    def is_zero_vector(self, tolerance=1e-09):
+        """
+        Return True if it is a vector made up of all zeros (zero vector)
+        """
+        # return self.magnitude < tolerance
+        return True if all(isclose(c, 0) for c in self.coordinates) else False
 
     @property
     def dimension(self):
@@ -94,7 +114,7 @@ class Vector(object):
         return sqrt(
           sum(
             tuple(map(
-              lambda x:x * x, 
+              lambda x:round(x * x, 9), 
               self.coordinates
             )
           ))
@@ -120,11 +140,11 @@ class Vector(object):
         Definition:
           |v| dot |w| = ||v|| dot ||w|| * cos(teta)
         Operation:
-          |v| dot |w| = v1*w1 + v2*w2 + ... = vn*wn
+          |v| dot |w| = v1*w1 + v2*w2 + ... + vn*wn
         """
         return sum(
           tuple(map(
-            lambda x:x[0] * x[1], 
+            lambda x:round(x[0] * x[1], 11), 
             zip_longest(self.coordinates, other.coordinates, fillvalue=0)
             )
           )
@@ -132,16 +152,61 @@ class Vector(object):
 
     def angle(self, other):
         """
-        Return the asangle teta between two vectors using the Dot
-         Product operation.
+        Return the aangle teta (in radiants) between two vectors
+         using the Dot Product operation.
 
-        Definition:
+        Definition of Dot Product:
          |v| dot |w| = ||v|| * ||w|| * cos(teta)
         Operation:
          angle = arccos(|v| dot |w| / (||v|| * ||w||))
         """
         if other.__class__ != self.__class__:
             raise TypeError('can angle only two Vectors')
+        if self.is_zero_vector or other.is_zero_vector:
+            raise ZeroDivisionError(
+                'cannot calculate the magnitude ' 
+                'of the zero vetor')
         return acos(self.dot(other) / (self.magnitude * other.magnitude))
+
+    def is_parallel(self, other):
+        """
+        vectors are parallel: 
+         same direction 
+         or 
+         opposite direction
+         or
+         one is the zero vector
+         or 
+         they are the same vector 
+        """
+        if self.is_zero_vector \
+           or other.is_zero_vector:
+           return True
+        if self.__same_class_dot__(other):
+            return True
+                    
+        return False
+
+    def is_orthogonal(self, other):
+        """
+        Definition by Angle:
+         cos(teta)=0
+
+        Definition by Dot Product:
+         |v| dot |w| = 0
+
+        and
+        none of two is the zero vector
+        """
+        if self.is_zero_vector \
+           or other.is_zero_vector:
+           return True
+        return True if self.dot(other) == 0 else False
+
+    def is_opposite(self, other):
+        """
+        the angle between them is 180 degrees
+        """
+        return True if self.angle(other) == 1 else False
 
 
