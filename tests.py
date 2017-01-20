@@ -105,7 +105,44 @@ a = Vector([7.35, 0.221, 5.188])
 b = Vector([2.751, 8.259, 3.985])
 print(degrees(a.angle(b)))
 
+print('-----orthogonal or parallel-----')
+a = Vector([-7.579, -7.88])
+b = Vector([22.737, 23.64])
+print(a.is_parallel(b), a.is_orthogonal(b))  # True, False
 
+a = Vector([-2.029, 9.97, 4.172])
+b = Vector([-9.231, -6.639, -7.245])
+print(a.is_parallel(b), a.is_orthogonal(b))  # False, False
+
+a = Vector([-2.328, -7.284, -1.214])
+b = Vector([-1.821, 1.072, -2.94])
+
+print(a.is_parallel(b), a.is_orthogonal(b))  # False, True
+
+a = Vector([2.118, 4.827])
+b = Vector([0, 0])
+print(a.is_parallel(b), a.is_orthogonal(b))  # True, True
+
+print('--- Vector Projections ---')
+v = Vector([12, 5])
+b = Vector([2, 2])
+bu = b.unit
+print(bu)
+v_bu = v.dot(b.unit)
+print(v_bu)
+r = bu.multiply(v_bu)
+print('parallel projection', r)
+#print(a.projection_on(b))
+
+v = Vector([3.009, -6.172, 3.692, -2.51])
+b = Vector([6.404, -9.144, 2.759, 8.718])
+bu = b.unit
+print(bu)
+v_bu = v.dot(b.unit)
+print(v_bu)
+r = bu.multiply(v_bu)
+print('parallel component', r)
+print('orthogonal component', v.orthogonal_to_projection(b))
 
 
 

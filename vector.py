@@ -2,6 +2,12 @@ from itertools import zip_longest
 from math import sqrt, acos, isclose
 
 class Vector(object):
+    """
+    A class for vectors.
+    ~~~~~~~~~~~~~~~~~~~~
+
+    #TODO: use a decorator on methods to check if class equals Vector
+    """
     def __init__(self, coordinates):
         try:
             check = all(isinstance(c, (int, float)) for c in coordinates)
@@ -17,12 +23,15 @@ class Vector(object):
     def __str__(self):
         return 'Vector {}'.format(str(self.coordinates))
 
-    def __eq__(self, other):
+    def __eq__(self, other, tolerance=1e-09):
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Vectors')
         if other.dimension != self.dimension:
             return False
-        return all([isclose(c, other.coordinates[i]) for i, c in enumerate(self.coordinates)])
+        return all(
+            isclose(c, other.coordinates[i], abs_tol=tolerance) 
+            for i, c in enumerate(self.coordinates)
+        )
     
     def __same_class__(self, other):
         """
@@ -47,7 +56,7 @@ class Vector(object):
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Vectors')
         return True if isclose(
-            abs(self.dot(other)), abs(self.magnitude * other.magnitude)
+            abs(self.dot(other)), abs(self.magnitude * other.magnitude), abs_tol=tolerance
         ) else False
 
     @property
@@ -56,11 +65,59 @@ class Vector(object):
         Return True if it is a vector made up of all zeros (zero vector)
         """
         # return self.magnitude < tolerance
-        return True if all(isclose(c, 0) for c in self.coordinates) else False
+        return True if all(
+            isclose(c, 0,  abs_tol=tolerance) for c in self.coordinates
+        ) else False
 
     @property
     def dimension(self):
         return len(self.coordinates)
+
+    @property
+    def magnitude(self, rounding=12):
+        """
+        Return the scalar that represent the Magnitude of the
+         original vector: ||v||
+        """
+        if self.is_zero_vector: return None
+        
+        return round(
+            sqrt(
+              sum(
+                tuple(map(
+                  lambda x:round(x * x, rounding), 
+                  self.coordinates
+                )
+              ))
+            ),
+        rounding)
+
+    @property
+    def unit(self):
+        """
+        Return a vector that is the Unit of the original vector:
+         |u| = |v| * (1 / ||v||) 
+        """
+        return self.__class__(
+          tuple([
+            c * (1 / self.magnitude)
+            for c in self.coordinates
+          ])  
+        )
+
+    def multiply(self, scalar, rounding=12):
+        """
+        Return a Vector that is the scalar multiplication of the
+         origianl vector and the scalar.
+        """
+        if not isinstance(scalar, (int, float)):
+            raise ValueError('scalar must be an integer or float')
+        return self.__class__(
+            tuple(map(
+              lambda x:round(x * scalar, rounding), 
+              self.coordinates
+            )
+        ))
  
     def add(self, other):
         """
@@ -89,56 +146,12 @@ class Vector(object):
             )
         )
 
-    def multiply(self, scalar):
-        """
-        Return a Vector that is the scalar multiplication of the
-         origianl vector and the scalar.
-        """
-        if not isinstance(scalar, (int, float)):
-            raise ValueError('scalar must be an integer or float')
-        return self.__class__(
-            tuple(map(
-              lambda x:x * scalar, 
-              self.coordinates
-            )
-        ))
-
-    @property
-    def magnitude(self):
-        """
-        Return the scalar that represent the Magnitude of the
-         original vector: ||v||
-        """
-        if all(c == 0 for c in self.coordinates): return None
-        
-        return sqrt(
-          sum(
-            tuple(map(
-              lambda x:round(x * x, 9), 
-              self.coordinates
-            )
-          ))
-        )
-
-    @property
-    def unit(self):
-        """
-        Return a vector that is the Unit of the original vector:
-         |u| = |v| * (1 / ||v||) 
-        """
-        return self.__class__(
-          tuple([
-            c * (1 / self.magnitude)
-            for c in self.coordinates
-          ])  
-        )
-
     def dot(self, other):
         """
         Return the Dot Product of two vectors.
 
         Definition:
-          |v| dot |w| = ||v|| dot ||w|| * cos(teta)
+          |v| dot |w| = ||v|| * ||w|| * cos(teta)
         Operation:
           |v| dot |w| = v1*w1 + v2*w2 + ... + vn*wn
         """
@@ -207,6 +220,35 @@ class Vector(object):
         """
         the angle between them is 180 degrees
         """
+        if self.is_zero_vector \
+           or other.is_zero_vector:
+           return True
         return True if self.angle(other) == 1 else False
+
+    def projection_on(self, base):
+        """
+        Return the projection of the vector on a given base.
+
+        parallel = (|v| dot unit_of_base) * unit_of_base
+        """
+        if base.__class__ != self.__class__:
+            raise TypeError('can project only two Vectors')
+        if self.is_zero_vector \
+           or base.is_zero_vector:
+           raise ValueError('Cannot project with zero vector')
+        return base.unit.multiply(base.unit.dot(self))
+
+
+    def orthogonal_to_projection(self, base):
+        """
+        Return the vector orthogonal to a given base (the addend
+         to the projection to sum up to the original vector)        
+        """
+        if base.__class__ != self.__class__:
+            raise TypeError('can project only two Vectors')
+        if self.is_zero_vector \
+           or base.is_zero_vector:
+           raise ValueError('Cannot project with zero vector')
+        return self.subtract(self.projection_on(base))
 
 
