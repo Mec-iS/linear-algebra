@@ -63,10 +63,10 @@ class TestVector(unittest.TestCase):
 
     def test_magnitude(self):
         w = Vector(self.test)
-        self.assertTrue(w.magnitude == 14.053007686)
+        self.assertTrue(w.magnitude == 14.053007686369)
 
         y = w.multiply(2.4565737456)
-        self.assertTrue(y.magnitude == 34.52224973)
+        self.assertTrue(y.magnitude == 34.522249729049)
 
     def test_addition(self):
         w = Vector(self.test)
@@ -79,6 +79,19 @@ class TestVector(unittest.TestCase):
 
         self.assertTrue(w.add(y) == Vector([17.360062041, 21.081631727999998, 8.56293961728, 13.601836204099998, 30.506061728]))
 
+    def test_cross_product(self):
+        v = Vector([5, 3, -2])
+        w = Vector([-1, 0, 3])
+
+        self.assertTrue(v.cross_product(w) == Vector([9, -13, 3]))
+
+        y = Vector([5.4534, 3.234, -2.1])
+        z = Vector([-1.98, 0, 3.8])
+        self.assertTrue(y.cross_product(z) == Vector([12.2892, -16.56492, 6.40332]))
+
+        a = Vector([2.4342, 3.2523, -2.1233])
+        b = Vector([-1.9888, 0, 3.899])
+        self.assertTrue(a.cross_product(b) == Vector([12.6807177, -5.26812676, 6.46817424]))
 
 
 if __name__ == '__main__':

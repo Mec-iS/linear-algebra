@@ -8,6 +8,9 @@ class Vector(object):
 
     #TODO: use a decorator on methods to check if class equals Vector
     """
+    ROUNDING = 12
+    TOLERANCE = 1e-09
+    
     def __init__(self, coordinates):
         try:
             check = all(isinstance(c, (int, float)) for c in coordinates)
@@ -23,7 +26,7 @@ class Vector(object):
     def __str__(self):
         return 'Vector {}'.format(str(self.coordinates))
 
-    def __eq__(self, other, tolerance=1e-09):
+    def __eq__(self, other, tolerance=TOLERANCE):
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Vectors')
         if other.dimension != self.dimension:
@@ -42,7 +45,7 @@ class Vector(object):
             raise TypeError('can compare only two Vectors')
         return True if self.unit == other.unit else False
 
-    def __same_class_dot__(self, other, tolerance=1e-09):
+    def __same_class_dot__(self, other, tolerance=TOLERANCE):
         """
         Chek if two vectors are in the same class using dot 
          product. (if they are in the same class, they are parallel).
@@ -60,7 +63,7 @@ class Vector(object):
         ) else False
 
     @property
-    def is_zero_vector(self, tolerance=1e-09):
+    def is_zero_vector(self, tolerance=TOLERANCE):
         """
         Return True if it is a vector made up of all zeros (zero vector)
         """
@@ -74,7 +77,7 @@ class Vector(object):
         return len(self.coordinates)
 
     @property
-    def magnitude(self, rounding=12):
+    def magnitude(self, rounding=ROUNDING):
         """
         Return the scalar that represent the Magnitude of the
          original vector: ||v||
@@ -105,7 +108,7 @@ class Vector(object):
           ])  
         )
 
-    def multiply(self, scalar, rounding=12):
+    def multiply(self, scalar, rounding=ROUNDING):
         """
         Return a Vector that is the scalar multiplication of the
          origianl vector and the scalar.
@@ -146,7 +149,7 @@ class Vector(object):
             )
         )
 
-    def dot(self, other):
+    def dot(self, other, rounding=ROUNDING):
         """
         Return the Dot Product of two vectors.
 
@@ -157,7 +160,7 @@ class Vector(object):
         """
         return sum(
           tuple(map(
-            lambda x:round(x[0] * x[1], 11), 
+            lambda x:round(x[0] * x[1], rounding), 
             zip_longest(self.coordinates, other.coordinates, fillvalue=0)
             )
           )
@@ -251,4 +254,29 @@ class Vector(object):
            raise ValueError('Cannot project with zero vector')
         return self.subtract(self.projection_on(base))
 
+    def cross_product(self, other, rounding=ROUNDING):
+        """
+        Return the cross product of the vector with another vector.
+
+        Definition:
+         For magnitudes:
+         ||v  x  w|| = ||v|| * ||w|| * sin(teta)
+
+        Operation:
+         For vectors:
+         |v| x |w| = [y1z2 - y2z1, -(x1z2 - x2z1), x1y2 - x2y1]
+
+        Implications:
+         * if ||v  x  w|| == 0: the vectors have the same direction
+         * ||v  x  w|| equals the area of the parallelogram defined by the vectors
+        """
+        if not self.dimension == 3 or not other.dimension == 3:
+            raise ValueError('cross product works only with 3d vectors')
+        return self.__class__(
+            [
+              round(self.coordinates[1] * other.coordinates[2] - other.coordinates[1] * self.coordinates[2], rounding),
+              round(-(self.coordinates[0] * other.coordinates[2] - other.coordinates[0] * self.coordinates[2]), rounding),
+              round(self.coordinates[0] * other.coordinates[1] - other.coordinates[0] * self.coordinates[1], rounding)
+            ]
+        )
 
