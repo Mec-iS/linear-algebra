@@ -25,6 +25,25 @@ class TestLine(unittest.TestCase):
         l6 = Line2D(Vector([1.773, 8.343]), 9.525)
         self.assertRaises(ValueError, l5.intersection, l6)
 
+    def test_intersection_multi(self):
+        l3 = Line2D(Vector([7.204, 3.182]), 8.68)
+        l4 = Line2D(Vector([8.172, 4.114]), 9.883)
+
+        self.assertTrue(l3.intersection_multi([l4]) == [(1.1727766354646403, 0.07269551166333513)])
+
+        l3 = Line2D(Vector([7.204, 3.182]), 8.68)
+        l4 = Line2D(Vector([8.172, 4.114]), 9.883)
+        l5 = Line2D(Vector([1.182, 5.562]), 6.744)
+
+        self.assertTrue(len(l3.intersection_multi([l4, l5])) == 3)
+
+        l3 = Line2D(Vector([7.204, 3.182]), 8.68)
+        l4 = Line2D(Vector([8.172, 4.114]), 9.883)
+        l5 = Line2D(Vector([8.172, 4.114]), 7)
+
+        self.assertRaises(ValueError, l3.intersection_multi, [l4, l5])
+
+
 
 
 

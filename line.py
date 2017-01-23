@@ -21,6 +21,9 @@ class Line2D(object):
         self.A = self.normal_vector.coordinates[0]
         self.B = self.normal_vector.coordinates[1]
 
+    def __str__(self):
+        return str('Line with normal {} and basepoint ({})').format(str(self.normal), str(self.basepoint))
+
     def set_basepoint(self, rounding=__ROUNDING):
         if self.normal_vector.coordinates[1] != 0:
             # B != 0 so (0, k/B) is a base point
@@ -38,6 +41,12 @@ class Line2D(object):
             return False
         test_vector = Vector([self.basepoint, other.basepoint])
         return test_vector.is_orthogonal(self.normal_vector)
+
+    def __ne__(self, other):
+        """
+        Two lines are not the same line. 
+        """
+        return not self.__eq__(other)
 
     def is_parallel(self, other):
         """
@@ -61,7 +70,7 @@ class Line2D(object):
 
     def intersection(self, other, rounding=__ROUNDING):
         """
-        Find intersection of two lines that are not parallel nor the same line
+        Find intersection of more than two lines that are not parallel nor the same line.
         """
         if other.__class__ != self.__class__:
             raise TypeError('can compare only two Lines')
@@ -76,5 +85,30 @@ class Line2D(object):
         numerator2 = round(-(other.A * self.k) +  (self.A * other.k), rounding)
         
         return numerator1 / denominator, numerator2 / denominator
+
+    def intersection_multi(self, other, rounding=__ROUNDING):
+        """
+        Find all the intersections of two or more lines that are not parallel nor the same line.
+         `other` is a list.
+        """
+        if not isinstance(other, list):
+            other = [other]
+        if not all(o.__class__ == self.__class__ for o in other):
+            raise TypeError('can compare only Lines')
+               
+        full = [self] + other
+        import itertools
+        prod = []
+        [prod.append(f) 
+          for f in itertools.product(full, full) 
+          if f[0] is not f[1] and (f[1], f[0]) not in prod]
+        print(prod)
+
+        if any(p[0] == p[1] or p[0].is_parallel(p[1]) for p in prod): 
+            raise ValueError('two of the lines are the same line or they are parallel')
+
+        return [o[0].intersection(o[1]) for o in prod]
+            
+
 
 
