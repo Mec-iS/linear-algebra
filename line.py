@@ -14,8 +14,10 @@ class Line2D(object):
 
     def __init__(self, normal_vector=None, const_term=None):
         # normal vector = [A, B]
-        self.normal_vector = normal_vector if normal_vector is not None else ValueError('line needs a normal vector')
-        if not self.normal_vector.__class__ == Vector: raise TypeError('normal vector must be a Vector')
+        self.normal_vector = normal_vector \
+            if normal_vector is not None and not normal_vector.is_zero_vector \
+            else ValueError('line needs a normal vector and must be not a zero vector')
+        if not self.normal_vector.__class__ == Vector: raise TypeError('normal vector must be of class Vector')
         self.term = self.k = const_term if const_term is not None else 0
 
         self.A = self.normal_vector.coordinates[0]
@@ -23,14 +25,6 @@ class Line2D(object):
 
     def __str__(self):
         return str('Line with normal {} and basepoint ({})').format(str(self.normal), str(self.basepoint))
-
-    def set_basepoint(self, rounding=__ROUNDING):
-        if self.normal_vector.coordinates[1] != 0:
-            # B != 0 so (0, k/B) is a base point
-            return round(self.term / self.normal_vector.coordinates[1], rounding)
-        if self.normal_vector.coordinates[0] != 0:
-            # A != 0 so (k/A, 0) is a base point
-            return round(self.term / self.normal_vector.coordinates[1], rounding)
 
     def __eq__(self, other):
         """
@@ -68,6 +62,20 @@ class Line2D(object):
     def basepoint(self):
         return self.set_basepoint()
 
+    def set_basepoint(self, rounding=__ROUNDING):
+        if self.B != 0:
+            # B != 0 so (0, k/B) is a base point
+            return round(self.term / self.B, rounding)
+        if self.A != 0:
+            # A != 0 so (k/A, 0) is a base point
+            return round(self.term / self.A, rounding)
+
+        raise ValueError('normal vector cannot be the zero vector')
+
+    @property
+    def direction(self, rounding=__ROUNDING):
+        return Vector([self.B, -self.A])
+
     def intersection(self, other, rounding=__ROUNDING):
         """
         Find intersection of more than two lines that are not parallel nor the same line.
@@ -102,7 +110,6 @@ class Line2D(object):
         [prod.append(f) 
           for f in itertools.product(full, full) 
           if f[0] is not f[1] and (f[1], f[0]) not in prod]
-        print(prod)
 
         if any(p[0] == p[1] or p[0].is_parallel(p[1]) for p in prod): 
             raise ValueError('two of the lines are the same line or they are parallel')

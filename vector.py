@@ -13,18 +13,33 @@ class Vector(object):
 
     def __init__(self, coordinates):
         try:
-            check = all(isinstance(c, (int, float)) for c in coordinates)
+            check = all(isinstance(c, (int, float)) for c in coordinates) and len(coordinates) > 1
             if check:
                 setattr(self, 'coordinates', tuple(coordinates))
             else:
                 raise ValueError('all coordinates must be int or float')  
         except TypeError as e:
             raise TypeError('coordinates must be a sequence')
-        except ValueError as e:
-            raise ValueError('all coordinates must be int or float')
+
+        self.X = self.coordinates[0]
+        self.Y = self.coordinates[1]
+
+        try:
+            self.Z = self.coordinates[1]
+        except:
+            pass
 
     def __str__(self):
         return 'Vector {}'.format(str(self.coordinates))
+
+    def __len__(self):
+        return len(self.coordinates)
+
+    def __getitem__(self, i):
+        return self.coordinates[i]
+
+    def __iter__(self):
+        return iter(self.coordinates)
 
     def __eq__(self, other, tolerance=__TOLERANCE):
         if other.__class__ != self.__class__:
@@ -271,7 +286,7 @@ class Vector(object):
          * ||v  x  w|| equals the area of the parallelogram defined by the vectors
         """
         if other.__class__ != self.__class__:
-            raise TypeError('can project only two Vectors')
+            raise TypeError('can make the product only from Vectors')
         if not self.dimension == 3 or not other.dimension == 3:
             raise ValueError('cross product works only with 3d vectors')
         return self.__class__(
