@@ -1,3 +1,3 @@
 # linear-algebra
 
-Works only with Python 3.6
+Works only with Python 3.5+
